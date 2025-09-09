@@ -52,6 +52,7 @@ const electronAPI = {
     onUpdateAvailable: (callback: (info: any) => void) => ipcRenderer.on('update-available', callback),
     onDownloadProgress: (callback: (progress: any) => void) => ipcRenderer.on('download-progress', callback),
     onUpdateDownloaded: (callback: (info: any) => void) => ipcRenderer.on('update-downloaded', callback),
+    onUpdateCancelled: (callback: (info: any) => void) => ipcRenderer.on('update-cancelled', callback),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, protocol } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -31,9 +31,29 @@ class MainProcess {
       console.log('🔍 [AUTO-UPDATE] Checking for updates...');
     });
     
-    autoUpdater.on('update-available', (info) => {
+    autoUpdater.on('update-available', async (info) => {
       console.log('📦 [AUTO-UPDATE] Update available:', info.version);
-      this.sendToRenderer('update-available', info);
+      
+      // Show dialog asking user if they want to update
+      const result = await dialog.showMessageBox(this.mainWindow!, {
+        type: 'question',
+        buttons: ['Cập nhật ngay', 'Hủy'],
+        defaultId: 0,
+        cancelId: 1,
+        title: 'Có bản cập nhật mới',
+        message: `Phiên bản ${info.version} đã có sẵn!`,
+        detail: 'Bạn có muốn tải xuống và cài đặt bản cập nhật ngay bây giờ không?'
+      });
+      
+      if (result.response === 0) {
+        // User chose to update
+        console.log('✅ [AUTO-UPDATE] User confirmed update');
+        this.sendToRenderer('update-available', info);
+        autoUpdater.downloadUpdate();
+      } else {
+        console.log('❌ [AUTO-UPDATE] User cancelled update');
+        this.sendToRenderer('update-cancelled', info);
+      }
     });
     
     autoUpdater.on('update-not-available', (info) => {
@@ -55,8 +75,18 @@ class MainProcess {
     });
   }
 
+  private setupProtocol(): void {
+    // Register protocol to serve static files
+    protocol.registerFileProtocol('app', (request, callback) => {
+      const url = request.url.substr(6); // Remove 'app://' prefix
+      const filePath = path.join(__dirname, '../assets', url);
+      callback({ path: filePath });
+    });
+  }
+
   private setupEventHandlers(): void {
     app.whenReady().then(() => {
+      this.setupProtocol();
       this.createWindow();
       this.setupIpcHandlers();
     });

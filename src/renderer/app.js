@@ -371,6 +371,19 @@ function toggleTheme() {
 function setTheme(theme) {
   console.log('Setting theme to:', theme);
   
+  // Add animation to both logos
+  const lightLogo = document.querySelector('.light-logo');
+  const darkLogo = document.querySelector('.dark-logo');
+  
+  if (lightLogo && darkLogo) {
+    lightLogo.classList.add('theme-changing');
+    darkLogo.classList.add('theme-changing');
+    setTimeout(() => {
+      lightLogo.classList.remove('theme-changing');
+      darkLogo.classList.remove('theme-changing');
+    }, 800);
+  }
+  
   // Batch all DOM updates for better performance
   const updates = () => {
     // Remove both possible classes first
@@ -1605,6 +1618,18 @@ function setupAutoUpdate() {
         if (elements.downloadUpdateBtn) {
           elements.downloadUpdateBtn.style.display = 'none';
         }
+      }
+    });
+    
+    // Handle update cancelled
+    window.electronAPI.onUpdateCancelled((info) => {
+      console.log('❌ [RENDERER] Update cancelled by user:', info);
+      showNotification('Cập nhật đã bị hủy', 'info');
+      
+      // Update settings tab if it's active
+      if (document.querySelector('.tab-content.active')?.id === 'settings') {
+        updateUpdateStatus('cancelled', 'Đã hủy cập nhật');
+        hideUpdateDetails();
       }
     });
   }

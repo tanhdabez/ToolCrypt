@@ -2017,3 +2017,156 @@ body.dark .switch::before {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* Logo Image Styles */
+.logo-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: brightness(1) contrast(1) saturate(1);
+}
+
+/* Light theme - show black logo, hide white logo */
+body:not(.dark) .light-logo {
+  display: block;
+  opacity: 1;
+}
+
+body:not(.dark) .dark-logo {
+  display: none;
+  opacity: 0;
+}
+
+/* Dark theme - show white logo, hide black logo */
+.dark .light-logo {
+  display: none;
+  opacity: 0;
+}
+
+.dark .dark-logo {
+  display: block;
+  opacity: 1;
+}
+
+/* Logo hover effects */
+.logo-image:hover {
+  transform: scale(1.08);
+}
+
+.dark .logo-image:hover {
+  transform: scale(1.08);
+}
+
+/* Logo animation on theme change */
+.logo-image.theme-changing {
+  animation: logoThemeChange 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes logoThemeChange {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% { 
+    transform: scale(1.1) rotate(90deg);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: scale(0.9) rotate(180deg);
+    opacity: 0.3;
+  }
+  75% { 
+    transform: scale(1.05) rotate(270deg);
+    opacity: 0.7;
+  }
+  100% { 
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* Container for logo positioning */
+.image {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Logo alignment when sidebar is collapsed */
+.sidebar.close .image {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  margin-left: 80px; /* Dịch logo sang phải một chút để cân bằng */
+  justify-content: center;
+  display: flex !important;
+  align-items: center;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.sidebar.close .logo-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  position: static !important;
+  opacity: 1 !important;
+  transform: none !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+
+
+/* Logo positioning when sidebar is collapsed */
+.sidebar.close .logo-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  position: static !important;
+  opacity: 1 !important;
+  transform: none !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Dark theme logo when sidebar is collapsed */
+.dark .sidebar.close .light-logo {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+.dark .sidebar.close .dark-logo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Light theme logo when sidebar is collapsed */
+body:not(.dark) .sidebar.close .light-logo {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+body:not(.dark) .sidebar.close .dark-logo {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* Header alignment when sidebar is collapsed */
+.sidebar.close header {
+  justify-content: center;
+  padding: 0 15px; /* Cân bằng padding */
+  display: flex;
+  align-items: center;
+}
+
+.sidebar.close .image-text {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}

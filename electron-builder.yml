@@ -1,16 +1,19 @@
 appId: com.toolcrypt.csvmanager
-productName: ToolCrypt CSV Manager
+productName: ToolCrypt
 directories:
-  output: build
+  output: build-new
 files:
   - dist/**/*
   - src/renderer/**/*
   - node_modules/**/*
   - package.json
+  - assets/**/*
 
 win:
   target: nsis
   publisherName: ToolCrypt
+  icon: assets/icon.png
+  requestedExecutionLevel: asInvoker
 
 nsis:
   oneClick: false
@@ -21,13 +24,6 @@ nsis:
   language: 1033
 
 publish:
-  provider: github
-  owner: tanhdabez
-  repo: ToolCrypt
-
-
-# Auto-update configuration
-updater:
   provider: github
   owner: tanhdabez
   repo: ToolCrypt
