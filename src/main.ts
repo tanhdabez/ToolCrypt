@@ -34,13 +34,13 @@ class MainProcess {
   }
 
   private setupAutoUpdater(): void {
-    // Configure auto-updater - Tạm thời tắt cho đến khi có Release
-    // autoUpdater.checkForUpdatesAndNotify();
+    // Configure auto-updater
+    autoUpdater.checkForUpdatesAndNotify();
     
-    // Check for updates every 1 hour (60 minutes) - Tạm thời tắt
-    // setInterval(() => {
-    //   autoUpdater.checkForUpdatesAndNotify();
-    // }, 60 * 60 * 1000);
+    // Check for updates every 1 hour (60 minutes)
+    setInterval(() => {
+      autoUpdater.checkForUpdatesAndNotify();
+    }, 60 * 60 * 1000);
     
     // Auto-updater events
     autoUpdater.on('checking-for-update', () => {
