@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToolCrypt CSV Manager</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar close" id="sidebar">
+      <header>
+        <div class="image-text">
+          <span class="image">
+            <i class="fas fa-chart-line logo-icon"></i>
+          </span>
+          <div class="text logo-text">
+            <span class="name">ToolCrypt</span>
+            <span class="profession">CSV Manager</span>
+          </div>
+        </div>
+        <i class='fas fa-chevron-right toggle' id="sidebar-toggle"></i>
+      </header>
+
+      <div class="menu-bar">
+        <div class="menu">
+          <ul class="menu-links">
+            <li class="nav-link active" data-tab="file-management">
+              <a href="#" class="nav-item-link">
+                <i class='fas fa-folder-open icon'></i>
+                <span class="text nav-text">Quản lý File</span>
+              </a>
+            </li>
+            <li class="nav-link" data-tab="analysis">
+              <a href="#" class="nav-item-link">
+                <i class='fas fa-filter icon'></i>
+                <span class="text nav-text">Lọc & Phân tích</span>
+              </a>
+            </li>
+            <li class="nav-link" data-tab="settings">
+              <a href="#" class="nav-item-link">
+                <i class='fas fa-cog icon'></i>
+                <span class="text nav-text">Cài đặt</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bottom-content">
+          <li class="mode">
+            <div class="sun-moon">
+              <i class='fas fa-moon icon moon'></i>
+              <i class='fas fa-sun icon sun'></i>
+            </div>
+            <span class="mode-text text">Dark mode</span>
+            <div class="toggle-switch" id="theme-toggle-btn">
+              <span class="switch"></span>
+            </div>
+          </li>
+          <li class="nav-item update-item" id="update-item" style="display: none;">
+            <i class="fas fa-download icon"></i>
+            <span class="text">Update Available</span>
+            <button class="update-btn" id="update-btn">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+          </li>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- File Management Tab -->
+      <div class="tab-content active" id="file-management">
+        <div class="tab-header">
+          <h1><i class="fas fa-folder-open"></i> Quản lý File CSV</h1>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="select-files-btn">
+              <i class="fas fa-plus"></i>
+              Chọn File
+            </button>
+            <button class="btn btn-danger" id="delete-all-btn">
+              <i class="fas fa-trash-alt"></i>
+              Xóa Tất Cả
+            </button>
+          </div>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="drop-zone">
+          <div class="drop-zone-content">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>Kéo thả file CSV vào đây</h3>
+            <p>hoặc click vào đây để chọn file</p>
+            <small>Hỗ trợ multiple files</small>
+          </div>
+        </div>
+
+        <!-- Files List -->
+        <div class="files-section">
+          <div class="section-header">
+            <h2>Danh sách File</h2>
+            <div class="files-count">
+              <span id="files-count">0 file</span>
+            </div>
+          </div>
+          
+          <div class="files-container" id="files-container">
+            <div class="empty-state" id="empty-state">
+              <i class="fas fa-file-csv"></i>
+              <h3>Chưa có file nào</h3>
+              <p>Hãy kéo thả hoặc chọn file CSV để bắt đầu</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Tab -->
+      <div class="tab-content" id="analysis">
+        <div class="tab-header">
+          <h1><i class="fas fa-filter"></i> Lọc & Phân tích CSV</h1>
+        </div>
+
+        <!-- File Selection -->
+        <div class="analysis-section">
+          <div class="section-header">
+            <h2>Chọn File để Phân tích</h2>
+            <small>Tối đa 10 file</small>
+          </div>
+          
+          <!-- Search and Filter -->
+          <div class="file-search-section">
+            <div class="search-input">
+              <i class="fas fa-search"></i>
+              <input type="text" id="file-search" placeholder="Tìm kiếm file...">
+            </div>
+            <div class="file-stats">
+              <span id="selected-count">0/10 file đã chọn</span>
+            </div>
+          </div>
+
+          <!-- File Selection Table -->
+          <div class="file-selection-table">
+            <div class="table-header">
+              <div class="table-row">
+                <div class="table-cell checkbox-cell">
+                  <input type="checkbox" id="select-all-checkbox">
+                </div>
+                <div class="table-cell">Tên File</div>
+                <div class="table-cell">Tags</div>
+                <div class="table-cell">Kích thước</div>
+                <div class="table-cell">Ngày tải</div>
+              </div>
+            </div>
+            <div class="table-body" id="file-selection-body">
+              <div class="empty-state">
+                <i class="fas fa-file-csv"></i>
+                <p>Không có file nào để chọn. Hãy upload file ở tab "Quản lý File" trước.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination" id="file-pagination" style="display: none;">
+            <button class="btn btn-sm btn-secondary" id="prev-page" disabled>
+              <i class="fas fa-chevron-left"></i>
+              Trước
+            </button>
+            <span class="page-info" id="page-info">Trang 1 / 1</span>
+            <button class="btn btn-sm btn-secondary" id="next-page" disabled>
+              Sau
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <div class="analysis-actions">
+            <button class="btn btn-primary" id="analyze-btn" disabled>
+              <i class="fas fa-play"></i>
+              Bắt đầu Phân tích
+            </button>
+            <button class="btn btn-secondary" id="clear-selection-btn">
+              <i class="fas fa-times"></i>
+              Xóa Chọn
+            </button>
+          </div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div class="results-section" id="results-section" style="display: none;">
+          <div class="section-header">
+            <h2>Kết quả Phân tích</h2>
+            <div class="results-summary" id="results-summary"></div>
+          </div>
+
+          <!-- Results Controls -->
+          <div class="results-controls">
+            <div class="control-group">
+              <label for="sort-by">Sắp xếp theo:</label>
+              <select id="sort-by">
+                <option value="transactions-desc">Số giao dịch (Giảm dần)</option>
+                <option value="transactions-asc">Số giao dịch (Tăng dần)</option>
+                <option value="time-asc">Thời gian (Sớm nhất)</option>
+                <option value="time-desc">Thời gian (Muộn nhất)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="page-size">Hiển thị:</label>
+              <select id="page-size">
+                <option value="50">50 ví/trang</option>
+                <option value="100">100 ví/trang</option>
+                <option value="150">150 ví/trang</option>
+                <option value="200">200 ví/trang</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Results Table -->
+          <div class="table-container">
+            <table class="results-table" id="results-table">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Địa chỉ Ví</th>
+                  <th>Tổng Giao dịch</th>
+                  <th>File Xuất hiện</th>
+                  <th>File Không xuất hiện</th>
+                  <th>Thời gian Sớm nhất</th>
+                  <th>Thời gian Muộn nhất</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="results-tbody">
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Results Pagination -->
+          <div class="pagination" id="results-pagination" style="display: none;">
+            <div class="pagination-controls">
+              <button class="btn btn-sm btn-secondary" id="results-first-page" disabled>
+                <i class="fas fa-angle-double-left"></i>
+                Đầu
+              </button>
+              <button class="btn btn-sm btn-secondary" id="results-prev-page" disabled>
+                <i class="fas fa-chevron-left"></i>
+                Trước
+              </button>
+              
+              <div class="page-selector">
+                <span>Trang</span>
+                <input type="number" id="page-input" min="1" value="1" class="page-input">
+                <span id="total-pages">/ 1</span>
+              </div>
+              
+              <button class="btn btn-sm btn-secondary" id="results-next-page" disabled>
+                Sau
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              <button class="btn btn-sm btn-secondary" id="results-last-page" disabled>
+                Cuối
+                <i class="fas fa-angle-double-right"></i>
+              </button>
+            </div>
+            
+            <div class="pagination-info">
+              <span id="results-page-info">Hiển thị 1-50 của 0 ví</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="analysis-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Đang phân tích dữ liệu...</p>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="tab-content" id="settings">
+        <div class="tab-header">
+          <h1><i class="fas fa-cog"></i> Cài đặt</h1>
+        </div>
+
+        <!-- Update Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-sync-alt"></i> Cập nhật</h2>
+            <p>Quản lý cập nhật ứng dụng</p>
+          </div>
+          
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Kiểm tra cập nhật thủ công</h3>
+                <p>Kiểm tra xem có phiên bản mới nào không</p>
+              </div>
+              <div class="setting-action">
+                <button class="btn btn-primary" id="manual-check-update">
+                  <i class="fas fa-search"></i>
+                  Kiểm tra ngay
+                </button>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Trạng thái cập nhật</h3>
+                <p id="update-status-text">Chưa kiểm tra</p>
+              </div>
+              <div class="setting-action">
+                <div class="update-status" id="update-status">
+                  <i class="fas fa-circle status-dot" id="status-dot"></i>
+                  <span id="status-text">Chưa kiểm tra</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item" id="update-info" style="display: none;">
+              <div class="setting-info">
+                <h3>Thông tin cập nhật</h3>
+                <div class="update-details" id="update-details">
+                  <!-- Update details will be populated here -->
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item" id="update-actions" style="display: none;">
+              <div class="setting-info">
+                <h3>Hành động</h3>
+                <p>Thực hiện cập nhật</p>
+              </div>
+              <div class="setting-action">
+                <button class="btn btn-success" id="download-update-btn" style="display: none;">
+                  <i class="fas fa-download"></i>
+                  Tải xuống
+                </button>
+                <button class="btn btn-warning" id="install-update-btn" style="display: none;">
+                  <i class="fas fa-install"></i>
+                  Cài đặt
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- App Info Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-info-circle"></i> Thông tin ứng dụng</h2>
+            <p>Thông tin về phiên bản hiện tại</p>
+          </div>
+          
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Phiên bản hiện tại</h3>
+                <p id="current-version">1.0.0</p>
+              </div>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Thời gian kiểm tra cuối</h3>
+                <p id="last-check-time">Chưa kiểm tra</p>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Tự động kiểm tra</h3>
+                <p>Mỗi 1 tiếng một lần</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debug Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <h2><i class="fas fa-bug"></i> Debug</h2>
+            <p>Thông tin debug và logs</p>
+          </div>
+          
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3>Debug Console</h3>
+                <p>Xem logs và thông tin debug</p>
+              </div>
+              <div class="setting-action">
+                <button class="btn btn-secondary" id="toggle-debug-console">
+                  <i class="fas fa-terminal"></i>
+                  Mở Debug Console
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="file-tags-modal">
+      <div class="modal-header">
+        <h3>Chỉnh sửa Tags</h3>
+        <button class="modal-close" id="modal-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="file-tags-input" placeholder="Nhập tags (phân cách bằng dấu phẩy)">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">Hủy</button>
+        <button class="btn btn-primary" id="modal-save">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="modal-overlay" id="confirm-overlay">
+    <div class="modal confirm-dialog" id="confirm-dialog">
+      <div class="modal-header">
+        <h3 id="confirm-title">Xác nhận</h3>
+        <button class="modal-close" id="confirm-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-content">
+          <i class="fas fa-exclamation-triangle confirm-icon"></i>
+          <p id="confirm-message">Bạn có chắc muốn thực hiện hành động này?</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="confirm-cancel">Hủy</button>
+        <button class="btn btn-danger" id="confirm-ok">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug Panel -->
+  <div class="debug-panel" id="debug-panel">
+    <div class="debug-header">
+      <span>Debug Console</span>
+      <button class="debug-toggle" id="debug-toggle">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="debug-content" id="debug-content">
+      <div class="debug-log">Debug logs will appear here...</div>
+    </div>
+    <div class="debug-actions">
+      <button class="btn btn-sm btn-secondary" id="clear-debug">Clear</button>
+    </div>
+  </div>
+
+  <!-- Debug Toggle Button - Only show when update is available -->
+  <div class="debug-toggle-btn" id="debug-toggle-btn" style="display: none;">
+    <i class="fas fa-bug"></i>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

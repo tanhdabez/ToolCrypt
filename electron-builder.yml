@@ -1,0 +1,40 @@
+appId: com.toolcrypt.csvmanager
+productName: ToolCrypt CSV Manager
+directories:
+  output: build
+files:
+  - dist/**/*
+  - src/renderer/**/*
+  - node_modules/**/*
+  - package.json
+  - assets/icon.ico
+
+win:
+  target: nsis
+  publisherName: ToolCrypt
+  icon: assets/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  installerIcon: assets/icon.ico
+  uninstallerIcon: assets/icon.ico
+  displayLanguageSelector: false
+  language: 1033
+
+publish:
+  provider: github
+  owner: your-username
+  repo: toolcrypt-csv-manager
+
+extraResources:
+  - from: assets/icon.ico
+    to: icon.ico
+
+# Auto-update configuration
+updater:
+  provider: github
+  owner: your-username
+  repo: toolcrypt-csv-manager

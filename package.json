@@ -1,0 +1,61 @@
+{
+  "name": "toolcrypt-csv-manager",
+  "version": "1.0.0",
+  "description": "CSV Manager with filtering and analysis features",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "electron dist/main.js",
+    "dev": "tsc && electron dist/main.js",
+    "build-exe": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.toolcrypt.csvmanager",
+    "productName": "ToolCrypt CSV Manager",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "src/renderer/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "publisherName": "ToolCrypt"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "your-username",
+      "repo": "toolcrypt-csv-manager"
+    },
+    "extraResources": [
+      {
+        "from": "assets/icon.ico",
+        "to": "icon.ico"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/papaparse": "^5.3.14",
+    "csv-parser": "^3.0.0",
+    "electron-updater": "^6.6.2",
+    "papaparse": "^5.4.1"
+  }
+}
