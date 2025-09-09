@@ -128,7 +128,7 @@ class MainProcess {
       height: 900,
       minWidth: 1000,
       minHeight: 700,
-      icon: this.getIconPath(), // QUAN TRỌNG - Set app icon
+      icon: this.getIconPath(),
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -136,17 +136,30 @@ class MainProcess {
       },
       titleBarStyle: 'default',
       show: false,
+      backgroundColor: '#000000',
     });
 
-    this.mainWindow.loadFile(path.join(__dirname, '../src/renderer/index.html'));
+    // Load loading screen first
+    this.mainWindow.loadFile(path.join(__dirname, '../src/renderer/loading.html'));
 
     this.mainWindow.once('ready-to-show', () => {
       this.mainWindow?.show();
+      
+      // After showing loading screen, wait a bit then load main app
+      setTimeout(() => {
+        this.loadMainApp();
+      }, 3000); // 3 seconds loading time
     });
 
     // Open DevTools in development
     if (process.env.NODE_ENV === 'development') {
       this.mainWindow.webContents.openDevTools();
+    }
+  }
+
+  private loadMainApp(): void {
+    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+      this.mainWindow.loadFile(path.join(__dirname, '../src/renderer/index.html'));
     }
   }
 

@@ -1,8 +1,8 @@
 version: 1.0.0
 files:
-  - url: ToolCrypt Setup 1.0.0.exe
-    sha512: placeholder-sha512-hash
-    size: 81500000
-path: ToolCrypt Setup 1.0.0.exe
-sha512: placeholder-sha512-hash
-releaseDate: '2024-12-19T08:30:00.000Z'
+  - url: ToolCrypt-Setup-1.0.0.exe
+    sha512: ILa2C2Jz+qeIWGja1UJ/9T8xbwgSrf3xP87OOjFbxi78r7aQ+i0xTk9MxHzLL+FKKCYXeO2M7FXIOpS26isFnw==
+    size: 77515475
+path: ToolCrypt-Setup-1.0.0.exe
+sha512: ILa2C2Jz+qeIWGja1UJ/9T8xbwgSrf3xP87OOjFbxi78r7aQ+i0xTk9MxHzLL+FKKCYXeO2M7FXIOpS26isFnw==
+releaseDate: '2025-09-09T09:29:35.703Z'

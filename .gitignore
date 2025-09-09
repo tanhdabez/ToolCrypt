@@ -7,7 +7,7 @@ yarn-error.log*
 # Build outputs
 dist/
 build/
-build-new/
+build-final/
 *.exe
 *.exe.blockmap
 *.dmg
