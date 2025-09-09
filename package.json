@@ -2,6 +2,7 @@
   "name": "toolcrypt-csv-manager",
   "version": "1.0.0",
   "description": "CSV Manager with filtering and analysis features",
+  "author": "ToolCrypt",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
@@ -30,21 +31,13 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "installerIcon": "assets/icon.ico",
-      "uninstallerIcon": "assets/icon.ico"
+      "createStartMenuShortcut": true
     },
     "publish": {
       "provider": "github",
       "owner": "your-username",
       "repo": "toolcrypt-csv-manager"
-    },
-    "extraResources": [
-      {
-        "from": "assets/icon.ico",
-        "to": "icon.ico"
-      }
-    ]
+    }
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
