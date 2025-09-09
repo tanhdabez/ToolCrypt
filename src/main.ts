@@ -17,14 +17,30 @@ class MainProcess {
     this.setupAutoUpdater();
   }
 
-  private setupAutoUpdater(): void {
-    // Configure auto-updater
-    autoUpdater.checkForUpdatesAndNotify();
+  private getIconPath(): string {
+    const isDev = !app.isPackaged;
     
-    // Check for updates every 1 hour (60 minutes)
-    setInterval(() => {
-      autoUpdater.checkForUpdatesAndNotify();
-    }, 60 * 60 * 1000);
+    if (process.platform === 'win32') {
+      // Dev dùng file trong project, Prod dùng file trong resources
+      return isDev
+        ? path.join(__dirname, '../assets/icon.ico')
+        : path.join(process.resourcesPath, 'assets/icon.ico');
+    } else {
+      // macOS/Linux dùng PNG
+      return isDev
+        ? path.join(__dirname, '../assets/icon.png')
+        : path.join(process.resourcesPath, 'assets/icon.png');
+    }
+  }
+
+  private setupAutoUpdater(): void {
+    // Configure auto-updater - Tạm thời tắt cho đến khi có Release
+    // autoUpdater.checkForUpdatesAndNotify();
+    
+    // Check for updates every 1 hour (60 minutes) - Tạm thời tắt
+    // setInterval(() => {
+    //   autoUpdater.checkForUpdatesAndNotify();
+    // }, 60 * 60 * 1000);
     
     // Auto-updater events
     autoUpdater.on('checking-for-update', () => {
@@ -86,6 +102,8 @@ class MainProcess {
 
   private setupEventHandlers(): void {
     app.whenReady().then(() => {
+      // Giúp Windows taskbar/notification nhận diện đúng app
+      app.setAppUserModelId('com.toolcrypt.csvmanager'); // Khớp appId trong config
       this.setupProtocol();
       this.createWindow();
       this.setupIpcHandlers();
@@ -110,6 +128,7 @@ class MainProcess {
       height: 900,
       minWidth: 1000,
       minHeight: 700,
+      icon: this.getIconPath(), // QUAN TRỌNG - Set app icon
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,

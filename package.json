@@ -1,7 +1,7 @@
 {
   "name": "toolcrypt-csv-manager",
   "version": "1.0.0",
-  "description": "CSV Manager with filtering and analysis features",
+  "description": "",
   "author": "ToolCrypt",
   "main": "dist/main.js",
   "scripts": {
@@ -25,7 +25,8 @@
     ],
     "win": {
       "target": "nsis",
-      "publisherName": "ToolCrypt"
+      "publisherName": "ToolCrypt",
+      "icon": "assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
