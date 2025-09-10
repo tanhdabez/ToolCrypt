@@ -135,6 +135,7 @@ class MainProcess {
         preload: path.join(__dirname, 'preload.js'),
       },
       titleBarStyle: 'default',
+      autoHideMenuBar: true,
       show: false,
       backgroundColor: '#000000',
     });

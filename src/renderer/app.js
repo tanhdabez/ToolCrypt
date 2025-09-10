@@ -21,6 +21,9 @@ const elements = {
   navItems: document.querySelectorAll('.nav-link'),
   modeText: document.querySelector('.mode-text'),
   
+  // Scroll to Top
+  scrollToTopBtn: document.getElementById('scroll-to-top'),
+  
   // File Management
   dropZone: document.getElementById('drop-zone'),
   selectFilesBtn: document.getElementById('select-files-btn'),
@@ -29,6 +32,20 @@ const elements = {
   filesContainer: document.getElementById('files-container'),
   filesCount: document.getElementById('files-count'),
   emptyState: document.getElementById('empty-state'),
+  
+  // File Management Pagination
+  fileManagementPagination: document.getElementById('file-management-pagination'),
+  fileFirstPage: document.getElementById('file-first-page'),
+  filePrevPage: document.getElementById('file-prev-page'),
+  fileNextPage: document.getElementById('file-next-page'),
+  fileLastPage: document.getElementById('file-last-page'),
+  filePageInput: document.getElementById('file-page-input'),
+  fileTotalPages: document.getElementById('file-total-pages'),
+  filePageInfo: document.getElementById('file-page-info'),
+  
+  // File Search
+  fileSearchInput: document.getElementById('file-search-input'),
+  clearFileSearch: document.getElementById('clear-file-search'),
   
   // Analysis
   fileSelectionBody: document.getElementById('file-selection-body'),
@@ -57,6 +74,13 @@ const elements = {
   resultsPageInfo: document.getElementById('results-page-info'),
   pageSize: document.getElementById('page-size'),
   
+  // Top pagination controls
+  topResultsFirstPage: document.getElementById('top-results-first-page'),
+  topResultsPrevPage: document.getElementById('top-results-prev-page'),
+  topResultsNextPage: document.getElementById('top-results-next-page'),
+  topResultsLastPage: document.getElementById('top-results-last-page'),
+  topPageInfo: document.getElementById('top-page-info'),
+  
   // Modal
   modalOverlay: document.getElementById('modal-overlay'),
   fileTagsModal: document.getElementById('file-tags-modal'),
@@ -74,12 +98,6 @@ const elements = {
   confirmCancel: document.getElementById('confirm-cancel'),
   confirmOk: document.getElementById('confirm-ok'),
   
-  // Debug Panel
-  debugPanel: document.getElementById('debug-panel'),
-  debugToggleBtn: document.getElementById('debug-toggle-btn'),
-  debugToggle: document.getElementById('debug-toggle'),
-  debugContent: document.getElementById('debug-content'),
-  clearDebug: document.getElementById('clear-debug'),
   
   // Settings
   manualCheckUpdate: document.getElementById('manual-check-update'),
@@ -104,45 +122,11 @@ let currentPage = 1;
 let itemsPerPage = 10;
 let filteredFiles = [];
 
-// Debug system
-let debugLogs = [];
-const originalConsoleLog = console.log;
-const originalConsoleError = console.error;
+// File Management Pagination
+let currentFilePage = 1;
+let filesPerPage = 12; // Show 12 files per page for better grid layout
+let fileSearchQuery = ''; // Store search query for file search
 
-// Override console.log to also show in debug panel
-console.log = function(...args) {
-  originalConsoleLog.apply(console, args);
-  addDebugLog('LOG', args.join(' '));
-};
-
-console.error = function(...args) {
-  originalConsoleError.apply(console, args);
-  addDebugLog('ERROR', args.join(' '));
-};
-
-function addDebugLog(type, message) {
-  const timestamp = new Date().toLocaleTimeString();
-  const logEntry = `[${timestamp}] ${type}: ${message}`;
-  debugLogs.push(logEntry);
-  
-  // Keep only last 100 logs
-  if (debugLogs.length > 100) {
-    debugLogs = debugLogs.slice(-100);
-  }
-  
-  updateDebugPanel();
-}
-
-function updateDebugPanel() {
-  if (elements.debugContent) {
-    const logElement = elements.debugContent.querySelector('.debug-log');
-    if (logElement) {
-      logElement.textContent = debugLogs.join('\n');
-      // Auto scroll to bottom
-      elements.debugContent.scrollTop = elements.debugContent.scrollHeight;
-    }
-  }
-}
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
@@ -258,6 +242,25 @@ function initializeEventListeners() {
       }
     });
   }
+  
+  // Top pagination controls
+  if (elements.topResultsFirstPage) {
+    elements.topResultsFirstPage.addEventListener('click', () => changeResultsPage(1));
+  }
+  if (elements.topResultsPrevPage) {
+    elements.topResultsPrevPage.addEventListener('click', () => changeResultsPage(currentResultsPage - 1));
+  }
+  if (elements.topResultsNextPage) {
+    elements.topResultsNextPage.addEventListener('click', () => changeResultsPage(currentResultsPage + 1));
+  }
+  if (elements.topResultsLastPage) {
+    elements.topResultsLastPage.addEventListener('click', () => {
+      if (analysisResults && analysisResults.wallets) {
+        const totalPages = Math.ceil(analysisResults.wallets.length / resultsPerPage);
+        changeResultsPage(totalPages);
+      }
+    });
+  }
   if (elements.pageInput) {
     elements.pageInput.addEventListener('change', (e) => {
       const page = parseInt(e.target.value);
@@ -330,16 +333,6 @@ function initializeEventListeners() {
     });
   }
   
-  // Debug Panel
-  if (elements.debugToggleBtn) {
-    elements.debugToggleBtn.addEventListener('click', toggleDebugPanel);
-  }
-  if (elements.debugToggle) {
-    elements.debugToggle.addEventListener('click', toggleDebugPanel);
-  }
-  if (elements.clearDebug) {
-    elements.clearDebug.addEventListener('click', clearDebugLogs);
-  }
   
   // Settings
   if (elements.manualCheckUpdate) {
@@ -351,8 +344,68 @@ function initializeEventListeners() {
   if (elements.installUpdateBtn) {
     elements.installUpdateBtn.addEventListener('click', installUpdate);
   }
-  if (elements.toggleDebugConsole) {
-    elements.toggleDebugConsole.addEventListener('click', toggleDebugPanel);
+  
+  // Scroll to Top
+  if (elements.scrollToTopBtn) {
+    elements.scrollToTopBtn.addEventListener('click', scrollToTop);
+  }
+  
+  // Scroll event listener for showing/hiding scroll to top button
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    mainContent.addEventListener('scroll', handleScroll);
+  } else {
+    window.addEventListener('scroll', handleScroll);
+  }
+  
+  // File Management Pagination
+  if (elements.fileFirstPage) {
+    elements.fileFirstPage.addEventListener('click', () => changeFilePage(1));
+  }
+  if (elements.filePrevPage) {
+    elements.filePrevPage.addEventListener('click', () => changeFilePage(currentFilePage - 1));
+  }
+  if (elements.fileNextPage) {
+    elements.fileNextPage.addEventListener('click', () => changeFilePage(currentFilePage + 1));
+  }
+  if (elements.fileLastPage) {
+    elements.fileLastPage.addEventListener('click', () => {
+      const totalPages = Math.ceil(currentFiles.length / filesPerPage);
+      changeFilePage(totalPages);
+    });
+  }
+  if (elements.filePageInput) {
+    elements.filePageInput.addEventListener('change', (e) => {
+      const page = parseInt(e.target.value);
+      const totalPages = Math.ceil(currentFiles.length / filesPerPage);
+      if (page && page > 0 && page <= totalPages) {
+        changeFilePage(page);
+      } else {
+        e.target.value = currentFilePage;
+      }
+    });
+    
+    elements.filePageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.target.blur();
+      }
+    });
+  }
+  
+  // File Search
+  if (elements.fileSearchInput) {
+    elements.fileSearchInput.addEventListener('input', (e) => {
+      fileSearchQuery = e.target.value.toLowerCase().trim();
+      performFileSearch();
+    });
+  }
+  
+  if (elements.clearFileSearch) {
+    elements.clearFileSearch.addEventListener('click', () => {
+      elements.fileSearchInput.value = '';
+      fileSearchQuery = '';
+      performFileSearch();
+    });
   }
 }
 
@@ -584,18 +637,42 @@ async function loadFiles() {
 }
 
 function renderFiles() {
-  if (currentFiles.length === 0) {
-    elements.filesContainer.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-file-csv"></i>
-        <h3>Chưa có file nào</h3>
-        <p>Hãy kéo thả hoặc chọn file CSV để bắt đầu</p>
-      </div>
-    `;
+  // Get files to display (filtered or all)
+  const filesToDisplay = fileSearchQuery ? getFilteredFiles() : currentFiles;
+  
+  if (filesToDisplay.length === 0) {
+    if (fileSearchQuery) {
+      elements.filesContainer.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <h3>Không tìm thấy file nào</h3>
+          <p>Không có file nào khớp với từ khóa "${fileSearchQuery}"</p>
+        </div>
+      `;
+    } else {
+      elements.filesContainer.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-file-csv"></i>
+          <h3>Chưa có file nào</h3>
+          <p>Hãy kéo thả hoặc chọn file CSV để bắt đầu</p>
+        </div>
+      `;
+    }
+    // Hide pagination when no files
+    if (elements.fileManagementPagination) {
+      elements.fileManagementPagination.style.display = 'none';
+    }
     return;
   }
   
-  const filesHTML = currentFiles.map(file => `
+  // Calculate pagination
+  const totalPages = Math.ceil(filesToDisplay.length / filesPerPage);
+  const startIndex = (currentFilePage - 1) * filesPerPage;
+  const endIndex = startIndex + filesPerPage;
+  const pageFiles = filesToDisplay.slice(startIndex, endIndex);
+  
+  // Render only current page files
+  const filesHTML = pageFiles.map(file => `
     <div class="file-card" data-file-id="${file.id}">
       <div class="file-header">
         <div class="file-info">
@@ -632,6 +709,9 @@ function renderFiles() {
   `).join('');
   
   elements.filesContainer.innerHTML = filesHTML;
+  
+  // Update pagination
+  updateFilePagination(totalPages, filesToDisplay.length);
 }
 
 function renderTags(tags) {
@@ -645,7 +725,83 @@ function renderTags(tags) {
 }
 
 function updateFilesCount() {
-  elements.filesCount.textContent = `${currentFiles.length} file${currentFiles.length !== 1 ? 's' : ''}`;
+  const filesToDisplay = fileSearchQuery ? getFilteredFiles() : currentFiles;
+  elements.filesCount.textContent = `${filesToDisplay.length} file${filesToDisplay.length !== 1 ? 's' : ''}`;
+}
+
+function getFilteredFiles() {
+  if (!fileSearchQuery) return currentFiles;
+  
+  return currentFiles.filter(file => 
+    file.filename.toLowerCase().includes(fileSearchQuery)
+  );
+}
+
+function performFileSearch() {
+  // Reset to first page when searching
+  currentFilePage = 1;
+  
+  // Update clear button visibility
+  if (elements.clearFileSearch) {
+    elements.clearFileSearch.style.display = fileSearchQuery ? 'flex' : 'none';
+  }
+  
+  // Re-render files with search results
+  renderFiles();
+  updateFilesCount();
+}
+
+function changeFilePage(newPage) {
+  const filesToDisplay = fileSearchQuery ? getFilteredFiles() : currentFiles;
+  const totalPages = Math.ceil(filesToDisplay.length / filesPerPage);
+  if (newPage >= 1 && newPage <= totalPages) {
+    currentFilePage = newPage;
+    renderFiles();
+  }
+}
+
+function updateFilePagination(totalPages, totalFiles) {
+  if (!elements.fileManagementPagination) return;
+  
+  // Show/hide pagination based on total pages
+  if (totalPages <= 1) {
+    elements.fileManagementPagination.style.display = 'none';
+    return;
+  }
+  
+  elements.fileManagementPagination.style.display = 'block';
+  
+  // Update all navigation buttons
+  if (elements.fileFirstPage) {
+    elements.fileFirstPage.disabled = currentFilePage <= 1;
+  }
+  if (elements.filePrevPage) {
+    elements.filePrevPage.disabled = currentFilePage <= 1;
+  }
+  if (elements.fileNextPage) {
+    elements.fileNextPage.disabled = currentFilePage >= totalPages;
+  }
+  if (elements.fileLastPage) {
+    elements.fileLastPage.disabled = currentFilePage >= totalPages;
+  }
+  
+  // Update page input
+  if (elements.filePageInput) {
+    elements.filePageInput.value = currentFilePage;
+    elements.filePageInput.max = totalPages;
+  }
+  
+  // Update total pages display
+  if (elements.fileTotalPages) {
+    elements.fileTotalPages.textContent = `/ ${totalPages}`;
+  }
+  
+  // Update page info
+  if (elements.filePageInfo) {
+    const startIndex = (currentFilePage - 1) * filesPerPage + 1;
+    const endIndex = Math.min(currentFilePage * filesPerPage, totalFiles);
+    elements.filePageInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${totalFiles} file`;
+  }
 }
 
 async function deleteFile(fileId) {
@@ -660,6 +816,12 @@ async function deleteFile(fileId) {
     const success = await window.electronAPI.deleteCSVFile(fileId);
     if (success) {
       showNotification('Xóa file thành công', 'success');
+      // Reset search and pagination
+      fileSearchQuery = '';
+      if (elements.fileSearchInput) elements.fileSearchInput.value = '';
+      if (elements.clearFileSearch) elements.clearFileSearch.style.display = 'none';
+      currentFilePage = 1;
+      
       await loadFiles();
       // Also update analysis tab if needed
       if (selectedFiles.includes(fileId)) {
@@ -686,6 +848,12 @@ async function deleteAllFiles() {
     const success = await window.electronAPI.deleteAllCSVFiles();
     if (success) {
       showNotification('Xóa tất cả file thành công', 'success');
+      // Reset search and pagination
+      fileSearchQuery = '';
+      if (elements.fileSearchInput) elements.fileSearchInput.value = '';
+      if (elements.clearFileSearch) elements.clearFileSearch.style.display = 'none';
+      currentFilePage = 1;
+      
       await loadFiles();
       selectedFiles = []; // Clear selection
     } else {
@@ -786,17 +954,6 @@ function closeConfirmDialog() {
   }
 }
 
-// Debug Panel Functions
-function toggleDebugPanel() {
-  if (elements.debugPanel) {
-    elements.debugPanel.classList.toggle('open');
-  }
-}
-
-function clearDebugLogs() {
-  debugLogs = [];
-  updateDebugPanel();
-}
 
 // Expose functions to global scope for onclick handlers
 window.editFileTags = editFileTags;
@@ -1073,6 +1230,11 @@ function renderAnalysisResults() {
     </div>
   `;
   
+  // Show scroll to top button when results are available
+  if (elements.scrollToTopBtn) {
+    elements.scrollToTopBtn.classList.add('show');
+  }
+  
   // Render table
   renderResultsTable();
 }
@@ -1102,6 +1264,12 @@ function renderResultsTable() {
         case 'time-desc':
           wallets.sort((a, b) => new Date(b.latestTransaction) - new Date(a.latestTransaction));
           break;
+        case 'frequency-desc':
+          wallets.sort((a, b) => b.filesAppeared.length - a.filesAppeared.length);
+          break;
+        case 'frequency-asc':
+          wallets.sort((a, b) => a.filesAppeared.length - b.filesAppeared.length);
+          break;
       }
       
       // Calculate pagination
@@ -1130,11 +1298,6 @@ function renderResultsTable() {
             <td>
               <div class="file-list" title="${wallet.filesAppeared.join(', ')}">
                 ${wallet.filesAppeared.join(', ')}
-              </div>
-            </td>
-            <td>
-              <div class="file-list" title="${wallet.filesNotAppeared.join(', ')}">
-                ${wallet.filesNotAppeared.length > 0 ? wallet.filesNotAppeared.join(', ') : 'Không có'}
               </div>
             </td>
             <td>${formatDateTime(wallet.earliestTransaction)}</td>
@@ -1203,6 +1366,20 @@ function updateResultsPagination(totalPages) {
     elements.resultsLastPage.disabled = currentResultsPage >= totalPages;
   }
   
+  // Update top pagination controls
+  if (elements.topResultsFirstPage) {
+    elements.topResultsFirstPage.disabled = currentResultsPage <= 1;
+  }
+  if (elements.topResultsPrevPage) {
+    elements.topResultsPrevPage.disabled = currentResultsPage <= 1;
+  }
+  if (elements.topResultsNextPage) {
+    elements.topResultsNextPage.disabled = currentResultsPage >= totalPages;
+  }
+  if (elements.topResultsLastPage) {
+    elements.topResultsLastPage.disabled = currentResultsPage >= totalPages;
+  }
+  
   // Update page input
   if (elements.pageInput) {
     elements.pageInput.value = currentResultsPage;
@@ -1212,6 +1389,11 @@ function updateResultsPagination(totalPages) {
   // Update total pages display
   if (elements.totalPages) {
     elements.totalPages.textContent = `/ ${totalPages}`;
+  }
+  
+  // Update top page info
+  if (elements.topPageInfo) {
+    elements.topPageInfo.textContent = `Trang ${currentResultsPage} / ${totalPages}`;
   }
   
   // Update page info
@@ -1388,15 +1570,9 @@ function setupAutoUpdate() {
 
 function showUpdateNotification() {
   const updateItem = document.getElementById('update-item');
-  const debugToggleBtn = document.getElementById('debug-toggle-btn');
   
   if (updateItem) {
     updateItem.style.display = 'flex';
-  }
-  
-  // Show debug console button when update is available
-  if (debugToggleBtn) {
-    debugToggleBtn.style.display = 'block';
   }
 }
 
@@ -1632,6 +1808,59 @@ function setupAutoUpdate() {
         hideUpdateDetails();
       }
     });
+  }
+}
+
+// Scroll to Top Functions
+function scrollToTop() {
+  console.log('Scroll to top clicked');
+  try {
+    // Get the main content container
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      // Fallback to window scroll
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  } catch (error) {
+    console.error('Error scrolling to top:', error);
+    // Fallback method
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.scrollTop = 0;
+    } else {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }
+}
+
+function handleScroll() {
+  if (elements.scrollToTopBtn) {
+    // Check scroll position of main content container
+    const mainContent = document.querySelector('.main-content');
+    let scrollTop = 0;
+    
+    if (mainContent) {
+      scrollTop = mainContent.scrollTop;
+    } else {
+      scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    }
+    
+    console.log('Scroll position:', scrollTop);
+    
+    if (scrollTop > 300) {
+      elements.scrollToTopBtn.classList.add('show');
+    } else {
+      elements.scrollToTopBtn.classList.remove('show');
+    }
   }
 }
 

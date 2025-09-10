@@ -1,8 +1,8 @@
 version: 1.0.0
 files:
   - url: ToolCrypt-Setup-1.0.0.exe
-    sha512: ILa2C2Jz+qeIWGja1UJ/9T8xbwgSrf3xP87OOjFbxi78r7aQ+i0xTk9MxHzLL+FKKCYXeO2M7FXIOpS26isFnw==
-    size: 77515475
+    sha512: 1poOEyqCdCxkyMf/LOLx+rqVzuPiN95B9lekBk/QGn22muSyw+jQdb4ZOsDtRmedAk4RXDz1468ArQ3SLbPP4w==
+    size: 79267801
 path: ToolCrypt-Setup-1.0.0.exe
-sha512: ILa2C2Jz+qeIWGja1UJ/9T8xbwgSrf3xP87OOjFbxi78r7aQ+i0xTk9MxHzLL+FKKCYXeO2M7FXIOpS26isFnw==
-releaseDate: '2025-09-09T09:29:35.703Z'
+sha512: 1poOEyqCdCxkyMf/LOLx+rqVzuPiN95B9lekBk/QGn22muSyw+jQdb4ZOsDtRmedAk4RXDz1468ArQ3SLbPP4w==
+releaseDate: '2025-09-10T06:04:04.533Z'

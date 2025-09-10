@@ -112,11 +112,50 @@
             </div>
           </div>
           
+          <div class="file-search-container">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="file-search-input" placeholder="Tìm kiếm tên file..." />
+              <button class="btn btn-sm btn-secondary" id="clear-file-search" style="display: none;">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          
           <div class="files-container" id="files-container">
             <div class="empty-state" id="empty-state">
               <i class="fas fa-file-csv"></i>
               <h3>Chưa có file nào</h3>
               <p>Hãy kéo thả hoặc chọn file CSV để bắt đầu</p>
+            </div>
+          </div>
+          
+          <!-- File Pagination -->
+          <div class="pagination" id="file-management-pagination" style="display: none;">
+            <div class="pagination-controls">
+              <button class="btn btn-sm btn-secondary" id="file-first-page" disabled>
+                <i class="fas fa-angle-double-left"></i>
+              </button>
+              <button class="btn btn-sm btn-secondary" id="file-prev-page" disabled>
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              
+              <div class="page-selector">
+                <span>Trang</span>
+                <input type="number" id="file-page-input" min="1" value="1" class="page-input">
+                <span id="file-total-pages">/ 1</span>
+              </div>
+              
+              <button class="btn btn-sm btn-secondary" id="file-next-page" disabled>
+                <i class="fas fa-chevron-right"></i>
+              </button>
+              <button class="btn btn-sm btn-secondary" id="file-last-page" disabled>
+                <i class="fas fa-angle-double-right"></i>
+              </button>
+            </div>
+            
+            <div class="pagination-info">
+              <span id="file-page-info">Hiển thị 1-10 của 0 file</span>
             </div>
           </div>
         </div>
@@ -199,7 +238,7 @@
             <div class="results-summary" id="results-summary"></div>
           </div>
 
-          <!-- Results Controls -->
+          <!-- Results Controls - Top Pagination -->
           <div class="results-controls">
             <div class="control-group">
               <label for="sort-by">Sắp xếp theo:</label>
@@ -208,6 +247,8 @@
                 <option value="transactions-asc">Số giao dịch (Tăng dần)</option>
                 <option value="time-asc">Thời gian (Sớm nhất)</option>
                 <option value="time-desc">Thời gian (Muộn nhất)</option>
+                <option value="frequency-desc">Tần suất xuất hiện (Nhiều nhất)</option>
+                <option value="frequency-asc">Tần suất xuất hiện (Ít nhất)</option>
               </select>
             </div>
             <div class="control-group">
@@ -218,6 +259,24 @@
                 <option value="150">150 ví/trang</option>
                 <option value="200">200 ví/trang</option>
               </select>
+            </div>
+            <div class="control-group">
+              <label for="top-pagination">Chuyển trang:</label>
+              <div class="top-pagination-controls">
+                <button class="btn btn-sm btn-secondary" id="top-results-first-page" disabled>
+                  <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" id="top-results-prev-page" disabled>
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="page-info" id="top-page-info">Trang 1 / 1</span>
+                <button class="btn btn-sm btn-secondary" id="top-results-next-page" disabled>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="btn btn-sm btn-secondary" id="top-results-last-page" disabled>
+                  <i class="fas fa-angle-double-right"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -230,9 +289,8 @@
                   <th>Địa chỉ Ví</th>
                   <th>Tổng Giao dịch</th>
                   <th>File Xuất hiện</th>
-                  <th>File Không xuất hiện</th>
-                  <th>Thời gian Sớm nhất</th>
-                  <th>Thời gian Muộn nhất</th>
+                  <th>Thời gian Sớm</th>
+                  <th>Thời gian Muộn</th>
                   <th>Hành động</th>
                 </tr>
               </thead>
@@ -246,11 +304,9 @@
             <div class="pagination-controls">
               <button class="btn btn-sm btn-secondary" id="results-first-page" disabled>
                 <i class="fas fa-angle-double-left"></i>
-                Đầu
               </button>
               <button class="btn btn-sm btn-secondary" id="results-prev-page" disabled>
                 <i class="fas fa-chevron-left"></i>
-                Trước
               </button>
               
               <div class="page-selector">
@@ -260,11 +316,9 @@
               </div>
               
               <button class="btn btn-sm btn-secondary" id="results-next-page" disabled>
-                Sau
                 <i class="fas fa-chevron-right"></i>
               </button>
               <button class="btn btn-sm btn-secondary" id="results-last-page" disabled>
-                Cuối
                 <i class="fas fa-angle-double-right"></i>
               </button>
             </div>
@@ -381,28 +435,6 @@
           </div>
         </div>
 
-        <!-- Debug Section -->
-        <div class="settings-section">
-          <div class="section-header">
-            <h2><i class="fas fa-bug"></i> Debug</h2>
-            <p>Thông tin debug và logs</p>
-          </div>
-          
-          <div class="settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
-                <h3>Debug Console</h3>
-                <p>Xem logs và thông tin debug</p>
-              </div>
-              <div class="setting-action">
-                <button class="btn btn-secondary" id="toggle-debug-console">
-                  <i class="fas fa-terminal"></i>
-                  Mở Debug Console
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </main>
   </div>
@@ -448,26 +480,11 @@
     </div>
   </div>
 
-  <!-- Debug Panel -->
-  <div class="debug-panel" id="debug-panel">
-    <div class="debug-header">
-      <span>Debug Console</span>
-      <button class="debug-toggle" id="debug-toggle">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="debug-content" id="debug-content">
-      <div class="debug-log">Debug logs will appear here...</div>
-    </div>
-    <div class="debug-actions">
-      <button class="btn btn-sm btn-secondary" id="clear-debug">Clear</button>
-    </div>
-  </div>
 
-  <!-- Debug Toggle Button - Only show when update is available -->
-  <div class="debug-toggle-btn" id="debug-toggle-btn" style="display: none;">
-    <i class="fas fa-bug"></i>
-  </div>
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" id="scroll-to-top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
 
   <script src="app.js"></script>
 </body>
